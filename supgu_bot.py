@@ -1,59 +1,59 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
 
-# Ваш токен, который можно получить у BotFather
+# Р’Р°С€ С‚РѕРєРµРЅ, РєРѕС‚РѕСЂС‹Р№ РІР°Рј РІС‹РґР°Р» BotFather
 TOKEN = '8095508285:AAGU5pApgQuCmJijPU7VLrgoSen2QGTy59c'
 
-# Данные для выбора
+# Р”Р°РЅРЅС‹Рµ РґР»СЏ РІС‹Р±РѕСЂР°
 categories = {
-    "1": "ПВП аспект",
-    "2": "ПВЕ аспект",
-    "3": "Боссы"
+    "1": "РџР’Рџ Р°СЃРїРµРєС‚",
+    "2": "РџР’Р• Р°СЃРїРµРєС‚",
+    "3": "Р‘РѕСЃСЃС‹"
 }
 
-# Данные для каждой категории
+# Р”Р°РЅРЅС‹Рµ РґР»СЏ РєР°Р¶РґРѕР№ РєР°С‚РµРіРѕСЂРёРё
 items = {
-    "1": ["Ловкость, Сила атаки, Крит урон,"],
-    "2": ["Сила Атаки, Крит урон, Урон по босам"],
-    "3": ["кью, фуся, хил"]
+    "1": ["Р›РѕРІРєРѕСЃС‚СЊ, РЎРёР»Р° Р°С‚Р°РєРё, РљСЂРёС‚ СѓСЂРѕРЅ,"],
+    "2": ["РЎРёР»Р° РђС‚Р°РєРё, РљСЂРёС‚ СѓСЂРѕРЅ, РЈСЂРѕРЅ РїРѕ Р±РѕСЃР°Рј"],
+    "3": ["РєСЊСЋ, С„СѓСЃСЏ, С…РёР»"]
 }
 
 def start(update: Update, context: CallbackContext):
-    # Приветственное сообщение с перечнем выбора
+    # РџСЂРёРІРµС‚СЃС‚РІРµРЅРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ СЃ РїРµСЂРµС‡РЅРµРј РІС‹Р±РѕСЂР°
     keyboard = [
         [InlineKeyboardButton(text=categories["1"], callback_data="1")],
         [InlineKeyboardButton(text=categories["2"], callback_data="2")],
         [InlineKeyboardButton(text=categories["3"], callback_data="3")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text('Привет! Выберите категорию:', reply_markup=reply_markup)
+    update.message.reply_text('РџСЂРёРІРµС‚! Р’С‹Р±РµСЂРёС‚Рµ РєР°С‚РµРіРѕСЂРёСЋ:', reply_markup=reply_markup)
 
 def button(update: Update, context: CallbackContext):
     query = update.callback_query
     category_id = query.data
     
-    # Ответ с товарами по выбранной категории
+    # РћС‚РІРµС‚ СЃ С‚РѕРІР°СЂР°РјРё РїРѕ РІС‹Р±СЂР°РЅРЅРѕР№ РєР°С‚РµРіРѕСЂРёРё
     if category_id in items:
         item_list = "\n".join(items[category_id])
-        query.edit_message_text(f"Список товаров:\n{item_list}")
+        query.edit_message_text(f"РЎРїРёСЃРѕРє С‚РѕРІР°СЂРѕРІ:\n{item_list}")
 
 def main():
-    # Создаем объект Updater и передаем ему токен
+    # РЎРѕР·РґР°РµРј РѕР±СЉРµРєС‚ Updater Рё РїРµСЂРµРґР°РµРј РµРјСѓ С‚РѕРєРµРЅ
     updater = Updater(TOKEN, use_context=True)
 
-    # Получаем диспетчера для регистрации обработчиков
+    # РџРѕР»СѓС‡Р°РµРј РґРёСЃРїРµС‚С‡РµСЂР° РґР»СЏ СЂРµРіРёСЃС‚СЂР°С†РёРё РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ
     dp = updater.dispatcher
 
-    # Обработчик команды /start
+    # РћР±СЂР°Р±РѕС‚С‡РёРє РєРѕРјР°РЅРґС‹ /start
     dp.add_handler(CommandHandler("start", start))
 
-    # Обработчик для нажатий на кнопки
+    # РћР±СЂР°Р±РѕС‚С‡РёРє РґР»СЏ РЅР°Р¶Р°С‚РёР№ РЅР° РєРЅРѕРїРєРё
     dp.add_handler(CallbackQueryHandler(button))
 
-    # Запускаем бота
+    # Р—Р°РїСѓСЃРєР°РµРј Р±РѕС‚Р°
     updater.start_polling()
 
-    # Бот будет работать до тех пор, пока не будет остановлен
+    # Р‘РѕС‚ Р±СѓРґРµС‚ СЂР°Р±РѕС‚Р°С‚СЊ РґРѕ С‚РµС… РїРѕСЂ, РїРѕРєР° РЅРµ Р±СѓРґРµС‚ РѕСЃС‚Р°РЅРѕРІР»РµРЅ
     updater.idle()
 
 if __name__ == '__main__':
