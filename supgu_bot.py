@@ -6,14 +6,14 @@ TOKEN = '8095508285:AAGU5pApgQuCmJijPU7VLrgoSen2QGTy59c'
 
 # Данные для выбора
 categories = {
-    "1": "ПВП аспект",
+   "1": "ПВП аспект",
     "2": "ПВЕ аспект",
     "3": "Боссы"
 }
 
 # Данные для каждой категории
 items = {
-    "1": ["Ловкость, Сила атаки, Крит урон,"],
+   "1": ["Ловкость, Сила атаки, Крит урон,"],
     "2": ["Сила Атаки, Крит урон, Урон по босам"],
     "3": ["кью, фуся, хил"]
 }
@@ -43,18 +43,12 @@ def main():
     # Создаем объект Application и передаем ему токен
     application = Application.builder().token(TOKEN).build()
 
-    # Получаем диспетчера для регистрации обработчиков
-    dp = application.dispatcher
-
-    # Обработчик команды /start
-    dp.add_handler(CommandHandler("start", start))
-
-    # Обработчик для нажатий на кнопки
-    dp.add_handler(CallbackQueryHandler(button))
+    # Обработчики команд и запросов
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(button))
 
     # Запускаем бота
     application.run_polling()
 
 if __name__ == '__main__':
     main()
-
