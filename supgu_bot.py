@@ -13,31 +13,30 @@ categories = {
     "5": "Парвани"
 }
 
-# Подкатегории для категории 1
+# Подкатегории
 subcategories = {
-    "1": ["Оружие", "Артефакт", "Бижутерия"]
+    "1": ["Оружие", "Артефакт", "Бижутерия"],
+    "2": ["Оружие", "Артефакт", "Бижутерия"],
+    "3": ["6-8", "6-13", "6-27"],
+    "4": ["Свет", "Тьма", "Огонь", "Ветер", "Земля", "Вода"],
+    "5": ["1я пачка", "2я пачка"]
 }
 
 # Описание подкатегорий
 descriptions = {
     "Оружие": "макс сср",
     "Артефакт": "макс сср и туды сюда",
-    "Бижутерия": "все по максу"
-}
-
-# Данные для каждой категории
-items = {
-    "1": ["кью фуся хил"],
-    "2": ["123"],
-    "3": ["321"]
+    "Бижутерия": "все по максу",
+    "6-8": "убегаем",
+    "6-13": "прибегаем",
+    "6-27": "отбучиваем",
+    "1я пачка": "танк, хил, лас, все в блок и жир, хила в жир и хп восстановление",
+    "2я пачка": "другое описание"
 }
 
 # Функция старта
 async def start(update: Update, context: CallbackContext, edit_message=False):
-    keyboard = [
-        [InlineKeyboardButton(text=categories[key], callback_data=key)]
-        for key in categories
-    ]
+    keyboard = [[InlineKeyboardButton(text=categories[key], callback_data=key)] for key in categories]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if edit_message and update.callback_query:
@@ -51,30 +50,23 @@ async def button(update: Update, context: CallbackContext):
     category_id = query.data
     await query.answer()
 
-    if category_id == "1":
-        keyboard = [
-            [InlineKeyboardButton(text=sub, callback_data=f"subcat_1_{i+1}")]
-            for i, sub in enumerate(subcategories["1"])
-        ]
+    if category_id in subcategories:
+        keyboard = [[InlineKeyboardButton(text=sub, callback_data=f"subcat_{category_id}_{i}")]
+                    for i, sub in enumerate(subcategories[category_id], start=1)]
         keyboard.append([InlineKeyboardButton(text="Вернуться в начало", callback_data="start")])
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.message.edit_text("Выберите подкатегорию для ПВП:", reply_markup=reply_markup)
-    
-    elif category_id in ["2", "3"]:
-        item_list = "\n".join(items[category_id])
-        keyboard = [[InlineKeyboardButton(text="Вернуться в начало", callback_data="start")]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.message.edit_text(f"Список :\n{item_list}\n\nВыберите другую категорию:", reply_markup=reply_markup)
+        await query.message.edit_text(f"Выберите подкатегорию для {categories[category_id]}", reply_markup=reply_markup)
 
-    elif category_id.startswith("subcat_1_"):
-        subcategory_name = subcategories["1"][int(category_id.split("_")[2]) - 1]
-        description = descriptions[subcategory_name]
+    elif category_id.startswith("subcat_"):
+        _, cat_id, sub_id = category_id.split("_")
+        subcategory_name = subcategories[cat_id][int(sub_id) - 1]
+        description = descriptions.get(subcategory_name, "Нет описания")
         keyboard = [[InlineKeyboardButton(text="Вернуться в начало", callback_data="start")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.message.edit_text(f"{subcategory_name}\n{description}", reply_markup=reply_markup)
-
+    
     elif category_id == "start":
-        await start(update, context, edit_message=True)  # Теперь не вызывает ошибку
+        await start(update, context, edit_message=True)
 
 # Главная функция запуска бота
 def main():
@@ -85,4 +77,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
