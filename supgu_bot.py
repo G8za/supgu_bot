@@ -6,16 +6,18 @@ TOKEN = '8095508285:AAGU5pApgQuCmJijPU7VLrgoSen2QGTy59c'
 
 # Данные для выбора
 categories = {
-   "1": "ПВП аспект",
+    "1": "ПВП аспект",
     "2": "ПВЕ аспект",
-    "3": "Боссы"
+    "3": "Боссы",
+    "4": "СУПЕР БОСЫ НЕ НАЖИМАЙ",
 }
 
 # Данные для каждой категории
 items = {
-   "1": ["Ловкость, Сила атаки, Крит урон,"],
+    "1": ["Ловкость, Сила атаки, Крит урон,"],
     "2": ["Сила Атаки, Крит урон, Урон по босам"],
-    "3": ["кью, фуся, хил"]
+    "3": ["кью, фуся, хил"],
+   "4": ["послать его нахуй"]
 }
 
 # Функция для старта
@@ -24,7 +26,8 @@ async def start(update: Update, context: CallbackContext):
     keyboard = [
         [InlineKeyboardButton(text=categories["1"], callback_data="1")],
         [InlineKeyboardButton(text=categories["2"], callback_data="2")],
-        [InlineKeyboardButton(text=categories["3"], callback_data="3")]
+        [InlineKeyboardButton(text=categories["3"], callback_data="3")],
+         [InlineKeyboardButton(text=categories["4"], callback_data="4")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text('Привет! Выберите категорию:', reply_markup=reply_markup)
@@ -37,7 +40,17 @@ async def button(update: Update, context: CallbackContext):
     # Ответ с товарами по выбранной категории
     if category_id in items:
         item_list = "\n".join(items[category_id])
-        await query.edit_message_text(f"Список товаров:\n{item_list}")
+        await query.edit_message_text(f"Список товаров:\n{item_list}\n\nВыберите другую категорию:")
+        
+        # Отправляем снова меню выбора категорий
+        keyboard = [
+            [InlineKeyboardButton(text=categories["1"], callback_data="1")],
+            [InlineKeyboardButton(text=categories["2"], callback_data="2")],
+            [InlineKeyboardButton(text=categories["3"], callback_data="3")]
+            [InlineKeyboardButton(text=categories["4"], callback_data="4")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.message.reply_text('Выберите категорию:', reply_markup=reply_markup)
 
 def main():
     # Создаем объект Application и передаем ему токен
