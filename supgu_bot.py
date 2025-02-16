@@ -1,5 +1,5 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, CallbackContext
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, CallbackContext
 
 # Ваш токен, который вам выдал BotFather
 TOKEN = '8095508285:AAGU5pApgQuCmJijPU7VLrgoSen2QGTy59c'
@@ -18,7 +18,8 @@ items = {
     "3": ["кью, фуся, хил"]
 }
 
-def start(update: Update, context: CallbackContext):
+# Функция для старта
+async def start(update: Update, context: CallbackContext):
     # Приветственное сообщение с перечнем выбора
     keyboard = [
         [InlineKeyboardButton(text=categories["1"], callback_data="1")],
@@ -26,23 +27,24 @@ def start(update: Update, context: CallbackContext):
         [InlineKeyboardButton(text=categories["3"], callback_data="3")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text('Привет! Выберите категорию:', reply_markup=reply_markup)
+    await update.message.reply_text('Привет! Выберите категорию:', reply_markup=reply_markup)
 
-def button(update: Update, context: CallbackContext):
+# Функция для обработки кнопок
+async def button(update: Update, context: CallbackContext):
     query = update.callback_query
     category_id = query.data
     
     # Ответ с товарами по выбранной категории
     if category_id in items:
         item_list = "\n".join(items[category_id])
-        query.edit_message_text(f"Список товаров:\n{item_list}")
+        await query.edit_message_text(f"Список товаров:\n{item_list}")
 
 def main():
-    # Создаем объект Updater и передаем ему токен
-    updater = Updater(TOKEN, use_context=True)
+    # Создаем объект Application и передаем ему токен
+    application = Application.builder().token(TOKEN).build()
 
     # Получаем диспетчера для регистрации обработчиков
-    dp = updater.dispatcher
+    dp = application.dispatcher
 
     # Обработчик команды /start
     dp.add_handler(CommandHandler("start", start))
@@ -51,10 +53,8 @@ def main():
     dp.add_handler(CallbackQueryHandler(button))
 
     # Запускаем бота
-    updater.start_polling()
-
-    # Бот будет работать до тех пор, пока не будет остановлен
-    updater.idle()
+    application.run_polling()
 
 if __name__ == '__main__':
     main()
+
